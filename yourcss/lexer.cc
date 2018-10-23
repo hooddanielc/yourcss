@@ -5,6 +5,8 @@ namespace yourcss {
 lexer_t::lexer_error_t::lexer_error_t(const lexer_t *lexer, const char *msg):
   error_t(lexer->pos) { get_strm() << msg; }
 
+lexer_t::lexer_error_t::~lexer_error_t() = default;
+
 void lexer_t::print_tokens(const std::vector<token_t> &tokens) {
   for (const auto &token: tokens) {
     std::cout << token << std::endl;
@@ -71,7 +73,7 @@ void lexer_t::add_single_token(token_t::kind_t kind) {
   pop();
   pop_anchor();
   //tokens.push_back(token_t::make(anchor_pos, kind));
-  tokens.push_back(token_t::make(anchor_pos, token_t::PERIOD));
+  tokens.push_back(token_t::make(anchor_pos, kind));
 }
 
 std::vector<std::shared_ptr<token_t>> lexer_t::lex() {

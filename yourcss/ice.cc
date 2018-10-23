@@ -9,4 +9,6 @@ ice_t::ice_t(const pos_t &pos, const char *file, int line_number): error_t(pos) 
   get_strm() << file << ", " << line_number;
 }
 
+ice_t::~ice_t() = default;
+
 }

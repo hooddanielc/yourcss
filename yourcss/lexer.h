@@ -26,6 +26,8 @@ public:
     /* Report the position and what we found there. */
     lexer_error_t(const lexer_t *lexer, const char *msg);
 
+    virtual ~lexer_error_t();
+
   };  // lexer_t::lexer_error_t
 
   /* Heper method to print tokens returned from lex */

@@ -16,6 +16,8 @@ public:
   /* Return our diagnostic message. */
   virtual const char *what() const noexcept override final;
 
+  virtual ~error_t() override;
+
 protected:
 
   /* Do-little. */

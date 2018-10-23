@@ -29,4 +29,6 @@ std::ostream &error_t::get_strm() const {
   return *strm;
 }
 
+error_t::~error_t() = default;
+
 }  // yourcss
