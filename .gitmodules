@@ -1,0 +1,3 @@
+[submodule "lick"]
+	path = lick
+	url = https://github.com/JasonL9000/lick.git

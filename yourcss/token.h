@@ -53,6 +53,7 @@ public:
     CDO_TOKEN,
     SUBSTRING_MATCH_TOKEN,
     AT,
+    DELIM_TOKEN,
   };   // kind_t
 
   /* Cache the kind. */

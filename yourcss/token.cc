@@ -52,6 +52,7 @@ std::string token_t::get_desc(token_t::kind_t kind) {
     case CDO_TOKEN: return "CDO_TOKEN";
     case SUBSTRING_MATCH_TOKEN: return "SUBSTRING_MATCH_TOKEN";
     case AT: return "AT";
+    case DELIM_TOKEN: return "DELIM_TOKEN";
   }
   return "unknown";
 }
