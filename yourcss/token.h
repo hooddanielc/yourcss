@@ -54,6 +54,7 @@ public:
     SUBSTRING_MATCH_TOKEN,
     AT,
     DELIM_TOKEN,
+    PERCENT_TOKEN,
   };   // kind_t
 
   /* Cache the kind. */

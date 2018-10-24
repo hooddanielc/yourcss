@@ -39,6 +39,20 @@ public:
   /* Used by our public lex function. */
   std::vector<std::shared_ptr<token_t>> lex();
 
+  /* Lex a numeric token. set anchor before calling */
+  std::shared_ptr<token_t> lex_numeric_token();
+
+  /* Lex an ident token. set anchor before calling */
+  std::shared_ptr<token_t> lex_ident_token();
+
+  /* Checks if next 1-3 input code points would start an identifier */
+  bool peek_is_identifier();
+
+  bool is_name_start(char c);
+
+  /* Set the string and position to be tokenized, and keep state */
+  char reset_cursor(const char *next_);
+
 private:
 
   /* Return the current character from the source text but don't advance to
