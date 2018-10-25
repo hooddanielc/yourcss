@@ -13,6 +13,12 @@ void lexer_t::print_tokens(const std::vector<token_t> &tokens) {
   }
 }
 
+void lexer_t::print_tokens(const std::vector<std::shared_ptr<token_t>> &tokens) {
+  for (const auto &token: tokens) {
+    std::cout << (*token) << std::endl;
+  }
+}
+
 lexer_t::lexer_t(const char *next_cursor_):
   next_cursor(next_cursor_),
   is_ready(false),
@@ -42,9 +48,9 @@ char lexer_t::peek() const {
 }
 
 char lexer_t::reset_cursor(const char *saved_cursor) {
-  char c = peek();
   is_ready = false;
   next_cursor = saved_cursor;
+  char c = peek();
   return c;
 }
 
@@ -84,16 +90,30 @@ void lexer_t::add_single_token(token_t::kind_t kind) {
   tokens.push_back(token_t::make(anchor_pos, kind));
 }
 
+bool lexer_t::is_name_point(char c) {
+  if (is_name_start(c) || isdigit(c) || c == '-') {
+    return true;
+  }
+  return false;
+}
+
 bool lexer_t::is_name_start(char c) {
-  if (isalpha(c) || c == '_') {
+  if (isalpha(c) || c == '_' || is_non_ascii(c)) {
+    return true;
+  }
+  return false;
+}
+
+bool lexer_t::is_non_ascii(char c) {
+  if (static_cast<unsigned char> (c) > 127) {
     return true;
   }
   return false;
 }
 
 bool lexer_t::peek_is_identifier() {
-  const char *cursor_anchor;
   char first = peek();
+  const char *cursor_anchor = cursor;
   if (first == '\0' || isspace(first)) {
     reset_cursor(cursor_anchor);
     return false;
@@ -101,14 +121,16 @@ bool lexer_t::peek_is_identifier() {
 
   // does first start with '-'
   if (first == '-') {
-    char second = *(++cursor);
+    pop();
+    char second = peek();
     if (second == '\0' || isspace(second)) {
       reset_cursor(cursor_anchor);
       return false;
     }
     // is second a valid escape
     if (second == '\\') {
-      char third = *(++cursor);
+      pop();
+      char third = peek();
       // is third a new line character
       if (third == '\n') {
         reset_cursor(cursor_anchor);
@@ -134,7 +156,8 @@ bool lexer_t::peek_is_identifier() {
 
   // is first a valid escape
   if (first == '\\') {
-    char second = *(++cursor);
+    pop();
+    char second = peek();
     // is third a new line character
     if (second == '\n') {
       reset_cursor(cursor_anchor);
@@ -148,11 +171,108 @@ bool lexer_t::peek_is_identifier() {
   return false;
 }
 
+std::string lexer_t::consume_escape() {
+  int num_hex_consumed = 0;
+  const char *anchor_escape = cursor;
+  enum {
+    start,
+    escape_body,
+    hex_body,
+  } state = start;
+  bool go = true;
+  while (go) {
+    char c = peek();
+    switch (state) {
+      case start: {
+        switch (c) {
+          case '\\': {
+            pop();
+            state = escape_body;
+          }
+        }
+        break;
+      }
+
+      case escape_body: {
+        if (isxdigit(c)) {
+          state = hex_body;
+          num_hex_consumed += 1;
+          pop();
+        } else if (c != '\n') {
+          pop();
+          go = false;
+        } else {
+          throw lexer_error_t(this, "unexpected new line in escape body consume_escape()::escape_body");
+        }
+        break;
+      }
+
+      case hex_body: {
+        if (isxdigit(c)) {
+          if (num_hex_consumed >= 6) {
+            throw lexer_error_t(this, "hex number can only contain 6 digits in consume_escape()::hex_body");
+          }
+          num_hex_consumed += 1;
+          pop();
+          break;
+        }
+        if (isspace(c)) {
+          pop();
+          go = false;
+          break;
+        }
+        go = false;
+        break;
+      }
+
+    }
+  }
+  return std::string{anchor_escape, static_cast<size_t>(cursor - anchor_escape)};
+}
+
+bool lexer_t::peek_is_escape() {
+  const char *anchor_escape = cursor;
+  char c = peek();
+  if (c != '\\') {
+    return false;
+  }
+  pop();
+  c = peek();
+  if (c == '\n') {
+    reset_cursor(anchor_escape);
+    return false;
+  }
+  reset_cursor(anchor_escape);
+  return true;
+}
+
+std::string lexer_t::consume_name() {
+  const char *anchor_name = cursor;
+  bool go = true;
+  while (go) {
+    char c = peek();
+    if (c == '\0') {
+      go = false;
+    } else {
+      if (is_name_point(c)) {
+        pop();
+      } else if(peek_is_escape()) {
+        pop();
+      } else {
+        go = false;
+      }
+    }
+  }
+  return std::string{anchor_name, static_cast<size_t>(cursor - anchor_name)};
+}
+
 std::shared_ptr<token_t> lexer_t::lex_ident_token() {
+  set_anchor();
   enum {
     start,
     start_dash,
     name,
+    start_escape,
     escape,
   } state = start;
   bool go = true;
@@ -162,7 +282,6 @@ std::shared_ptr<token_t> lexer_t::lex_ident_token() {
       case start: {
         switch (c) {
           case '-': {
-            set_anchor();
             pop();
             state = start_dash;
             break;
@@ -182,20 +301,41 @@ std::shared_ptr<token_t> lexer_t::lex_ident_token() {
       case start_dash: {
         if (is_name_start(c)) {
           pop();
+          state = name;
+          break;
+        } else if (c == '\\') {
+          state = start_escape;
           break;
         }
-        pop();
-        auto text = pop_anchor();
-        return token_t::make(anchor_pos, token_t::PERCENT_TOKEN, std::move(text));
+        throw lexer_error_t(this, "unexpected beginning of ident-token in lex_ident_token()::start_dash");
       }
 
       case name: {
-        throw lexer_error_t(this, "todo");
+        if (is_name_start(c) || c == '-' || isdigit(c)) {
+          pop();
+          break;
+        } else if (c == '\\') {
+          state = start_escape;
+          break;
+        }
+        auto text = pop_anchor();
+        return token_t::make(anchor_pos, token_t::NUMBER_TOKEN, std::move(text));
+      }
+
+      case start_escape: {
+        if (c == '\n') {
+          pop();
+          state = start;
+          break;
+        }
+        state = escape;
+        break;
       }
 
       case escape: {
-        // TODO
-        throw lexer_error_t(this, "unexpected error");
+        auto text = consume_escape();
+        state = start;
+        break;
       }
     }
   } while (go);
@@ -205,6 +345,7 @@ std::shared_ptr<token_t> lexer_t::lex_ident_token() {
 
 std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
   // dimension token
+  set_anchor();
   std::shared_ptr<token_t> temp_number_token;
   std::shared_ptr<token_t> temp_identifier;
 
@@ -228,20 +369,17 @@ std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
         switch (c) {
           case '+':
           case '-': {
-            set_anchor();
             pop();
             state = start_mod;
             break;
           }
           case '.': {
-            set_anchor();
             pop();
             state = point;
             break;
           }
           default: {
             if (isdigit(c)) {
-              set_anchor();
               pop();
               state = number;
               break;
@@ -253,11 +391,16 @@ std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
       }
 
       case start_mod: {
-        if (c != '.' && !isdigit(c)) {
-          throw lexer_error_t(this, "unexpected char in lex_numeric_token()::start");
+        if (c == '.') {
+          pop();
+          state = point;
+          break;
         }
-        state = number;
-        break;
+        if (isdigit(c)) {
+          state = number;
+          break;
+        }
+        throw lexer_error_t(this, "unexpected char in lex_numeric_token()::start");
       }
 
       // number can only end with a digit
@@ -286,12 +429,13 @@ std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
           default: {
             if (peek_is_identifier()) {
               auto text = pop_anchor();
-              temp_number_token = token_t::make(anchor_pos, token_t::NUMBER_TOKEN, std::move(text));
-              temp_identifier = lex_ident_token();
-              throw lexer_error_t(this, "what now");
+              auto number = token_t::make(anchor_pos, token_t::NUMBER_TOKEN, std::move(text));
+              auto identifier = lex_ident_token();
+              auto token = dimension_token_t::make(*number, *identifier);
+              return std::move(token);
             } else {
               auto text = pop_anchor();
-              return token_t::make(anchor_pos, token_t::PERCENT_TOKEN, std::move(text));
+              return token_t::make(anchor_pos, token_t::NUMBER_TOKEN, std::move(text));
             }
           }
         }
@@ -362,12 +506,10 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
     string_,
     string_single,
     hash_start,
-    hash_escape,
-    hash_id,
-    hash_id_start,
     dollar_start,
     asterisk_start,
-    plus_start
+    plus_start,
+    minus_start,
   } state = start;
   bool go = true;
   do {
@@ -421,14 +563,26 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
           }
           case '+': {
             state = plus_start;
+            set_anchor();
+            pop();
+            break;
+          }
+          case '-': {
+            state = minus_start;
+            set_anchor();
             pop();
             break;
           }
           default: {
-            if (isspace(c) || c == '\n') {
+            if (isdigit(c)) {
+              auto token = lex_numeric_token();
+              tokens.push_back(token);
+              break;
+            } else if (isspace(c) || c == '\n') {
               set_anchor();
               pop();
               state = whitespace;
+              break;
             } else {
               std::string msg("unexpected character ");
               msg += c;
@@ -440,9 +594,27 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
       }
 
       case plus_start: {
-        if (isdigit(c)) {
+        if (isdigit(c) || c == '.') {
+          reset_cursor(anchor);
+          pop_anchor();
           auto token = lex_numeric_token();
           tokens.push_back(token);
+          state = start;
+        } else {
+          auto text = pop_anchor();
+          tokens.push_back(token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text)));
+          state = start;
+        }
+        break;
+      }
+
+      case minus_start: {
+        if (isdigit(c) || c == '.') {
+          reset_cursor(anchor);
+          pop_anchor();
+          auto token = lex_numeric_token();
+          tokens.push_back(token);
+          state = start;
         } else {
           auto text = pop_anchor();
           tokens.push_back(token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text)));
@@ -523,57 +695,15 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
       }
 
       case hash_start: {
-        switch (c) {
-          case '\\': {
-            state = hash_escape;
-            pop();
-            break;
-          }
-          default: {
-            if (isspace(c) || c == '\n') {
-              state = start;
-              auto text = pop_anchor();
-              tokens.push_back(token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text)));
-            } else {
-              state = hash_id_start;
-              pop();
-            }
-            break;
-          }
-        }
-        break;
-      }
-
-      case hash_escape: {
-        if (c != '\n' && !isspace(c)) {
-          state = hash_id_start;
-          pop();
+        if (peek_is_identifier()) {
+          pop_anchor();
+          auto text = consume_name();
+          tokens.push_back(token_t::make(anchor_pos, token_t::HASH_TOKEN, std::move(text)));
         } else {
           auto text = pop_anchor();
           tokens.push_back(token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text)));
-          state = start;
         }
-        break;
-      }
-
-      case hash_id_start: {
-        if (isalpha(c) || c == '_') {
-          state = hash_id;
-          pop();
-        } else {
-          throw lexer_error_t(this, "expected start of identifier");
-        }
-        break;
-      }
-
-      case hash_id: {
-        if (isalnum(c) || c == '_' || c == '-') {
-          pop();
-        } else {
-          auto text = pop_anchor();
-          tokens.push_back(token_t::make(anchor_pos, token_t::HASH_TOKEN, std::move(text)));
-          state = start;
-        }
+        state = start;
         break;
       }
 

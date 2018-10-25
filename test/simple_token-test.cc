@@ -22,6 +22,29 @@ FIXTURE(hash_token) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::HASH_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(tokens[1]->get_text(), std::string("\\asdf"));
+}
+
+FIXTURE(hash_token_dash) {
+  const char *src = R"(
+    #-moz-asdf
+  )";
+  auto tokens = lexer_t(src).lex();
+  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::HASH_TOKEN, tokens[1]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(tokens[1]->get_text(), std::string("-moz-asdf"));
+}
+
+FIXTURE(hash_name) {
+  const char *src = R"(
+    #asdf
+  )";
+  auto tokens = lexer_t(src).lex();
+  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::HASH_TOKEN, tokens[1]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(tokens[1]->get_text(), std::string("asdf"));
 }
 
 FIXTURE(simple_string) {
@@ -32,6 +55,7 @@ FIXTURE(simple_string) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::STRING_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(tokens[1]->get_text(), std::string("\"this is a string?\""));
 }
 
 FIXTURE(single_simple_string) {
@@ -42,6 +66,7 @@ FIXTURE(single_simple_string) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::STRING_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(tokens[1]->get_text(), std::string("'this is a string?'"));
 }
 
 FIXTURE(suffix_match_token) {
@@ -52,6 +77,7 @@ FIXTURE(suffix_match_token) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::SUFFIX_MATCH_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(tokens[1]->get_text(), std::string("$="));
 }
 
 
@@ -83,4 +109,5 @@ FIXTURE(substring_match_token) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::SUBSTRING_MATCH_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(tokens[1]->get_text(), std::string("*="));
 }

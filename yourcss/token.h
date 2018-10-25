@@ -55,6 +55,7 @@ public:
     AT,
     DELIM_TOKEN,
     PERCENT_TOKEN,
+    DIMENSION_TOKEN,
   };   // kind_t
 
   /* Cache the kind. */

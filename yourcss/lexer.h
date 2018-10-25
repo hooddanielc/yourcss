@@ -10,6 +10,7 @@
 #include "ice.h"
 #include "token.h"
 #include "pos.h"
+#include "tokens/dimension_token.h"
 
 namespace yourcss {
 
@@ -33,6 +34,9 @@ public:
   /* Heper method to print tokens returned from lex */
   static void print_tokens(const std::vector<token_t> &tokens);
 
+  /* Heper method to print tokens returned from lex */
+  static void print_tokens(const std::vector<std::shared_ptr<token_t>> &tokens);
+
   /* Used by our public lex function. */
   lexer_t(const char *next_cursor);
 
@@ -45,13 +49,32 @@ public:
   /* Lex an ident token. set anchor before calling */
   std::shared_ptr<token_t> lex_ident_token();
 
+  /* Consume a name token */
+  std::string consume_name();
+
+  /* Consume escaped code point */
+  std::string consume_escape();
+
   /* Checks if next 1-3 input code points would start an identifier */
   bool peek_is_identifier();
 
+  /* Checks if two code points are valid escape. */
+  bool peek_is_escape();
+
+  /* Checks if the next item in stream is a name code point */
+  bool is_name_point(char c);
+
+  /* Check if sequence of current cursor would start a name */
   bool is_name_start(char c);
 
   /* Set the string and position to be tokenized, and keep state */
   char reset_cursor(const char *next_);
+
+  /* Check if char is non-ascii */
+  bool is_non_ascii(char c);
+
+  /* Is valid escape */
+  bool is_valid_escape();
 
 private:
 

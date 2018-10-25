@@ -54,6 +54,7 @@ std::string token_t::get_desc(token_t::kind_t kind) {
     case AT: return "AT";
     case DELIM_TOKEN: return "DELIM_TOKEN";
     case PERCENT_TOKEN: return "PERCENT_TOKEN";
+    case DIMENSION_TOKEN: return "DIMENSION_TOKEN";
   }
   return "unknown";
 }
@@ -75,21 +76,15 @@ pos_t token_t::get_pos() const {
 }
 
 std::shared_ptr<token_t> token_t::make(token_t::kind_t kind) {
-  auto ptr = new token_t(kind);
-  std::shared_ptr<token_t> result(ptr);
-  return result;
+  return std::make_shared<token_t>(kind);
 }
 
 std::shared_ptr<token_t> token_t::make(const pos_t &pos, token_t::kind_t kind) {
-  auto ptr = new token_t(pos, kind);
-  std::shared_ptr<token_t> result(ptr);
-  return result;
+  return std::make_shared<token_t>(pos, kind);
 }
 
 std::shared_ptr<token_t> token_t::make(const pos_t &pos, token_t::kind_t kind, std::string &&text) {
-  auto ptr = new token_t(pos, kind, std::move(text));
-  std::shared_ptr<token_t> result(ptr);
-  return result;
+  return std::make_shared<token_t>(pos, kind, std::move(text));
 }
 
 /* Writes a human-readable dump of the token.  This is for debugging
