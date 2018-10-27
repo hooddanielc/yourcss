@@ -257,7 +257,7 @@ std::string lexer_t::consume_name() {
       if (is_name_point(c)) {
         pop();
       } else if(peek_is_escape()) {
-        pop();
+        consume_escape();
       } else {
         go = false;
       }
@@ -266,85 +266,273 @@ std::string lexer_t::consume_name() {
   return std::string{anchor_name, static_cast<size_t>(cursor - anchor_name)};
 }
 
-std::shared_ptr<token_t> lexer_t::lex_ident_token() {
-  set_anchor();
+std::shared_ptr<token_t> lexer_t::lex_url_token() {
+  auto url_pos = pos;
+  const char *anchor_url = cursor;
+  std::string text;
+  bool bad = false;
+  bool go = true;
   enum {
     start,
-    start_dash,
-    name,
-    start_escape,
-    escape,
+    white_space_begin,
+    white_space_end,
+    single_quote,
+    double_quote,
+    url_body,
+    bad_url,
   } state = start;
-  bool go = true;
   do {
     char c = peek();
-    // ghetto debug helper
-    // if (!isspace(c)) {
-    //   std::cout << " L: " << c << std::endl;
-    // }
-    switch(state) {
+    switch (state) {
       case start: {
         switch (c) {
-          case '-': {
+          case '\0': {
+            text = std::string{anchor_url, static_cast<size_t>(cursor - anchor_url)};
+            go = false;
+            break;
+          }
+          case '\'': {
             pop();
-            state = start_dash;
+            peek();
+            url_pos = pos;
+            state = single_quote;
+            break;
+          }
+          case '"': {
+            pop();
+            peek();
+            url_pos = pos;
+            state = double_quote;
             break;
           }
           default: {
-            if (is_name_start(c)) {
-              state = name;
+            if (isspace(c)) {
+              state = white_space_begin;
               pop();
               break;
             }
-            throw lexer_error_t(this, "unexpected char in lex_numeric_token()::start");
+            state = url_body;
+            break;
           }
         }
         break;
       }
 
-      case start_dash: {
-        if (is_name_start(c)) {
-          pop();
-          state = name;
-          break;
-        } else if (c == '\\') {
-          state = start_escape;
-          break;
+      case white_space_begin: {
+        switch (c) {
+          case '\0': {
+            state = start;
+            break;
+          }
+          case '\'': {
+            pop();
+            peek();
+            state = single_quote;
+            anchor_url = cursor;
+            url_pos = pos;
+            break;
+          }
+          case '"': {
+            pop();
+            peek();
+            state = double_quote;
+            anchor_url = cursor;
+            url_pos = pos;
+            break;
+          }
+          default: {
+            if (isspace(c)) {
+              pop();
+              break;
+            } else {
+              state = url_body;
+              url_pos = pos;
+              anchor_url = cursor;
+              break;
+            }
+          }
         }
-        throw lexer_error_t(this, "unexpected beginning of ident-token in lex_ident_token()::start_dash");
-      }
-
-      case name: {
-        if (is_name_start(c) || c == '-' || isdigit(c)) {
-          pop();
-          break;
-        } else if (c == '\\') {
-          state = start_escape;
-          break;
-        }
-        auto text = pop_anchor();
-        return token_t::make(anchor_pos, token_t::NUMBER_TOKEN, std::move(text));
-      }
-
-      case start_escape: {
-        if (c == '\n') {
-          pop();
-          state = start;
-          break;
-        }
-        state = escape;
         break;
       }
 
-      case escape: {
-        auto text = consume_escape();
-        state = start;
+      case white_space_end: {
+        if (isspace(c)) {
+          pop();
+          break;
+        } else if (c == ')') {
+          go = false;
+          pop();
+          break;
+        }
+        state = bad_url;
+        pop();
+        break;
+      }
+
+      case single_quote: {
+        text = consume_string('\'');
+        state = white_space_end;
+        break;
+      }
+
+      case double_quote: {
+        text = consume_string('"');
+        state = white_space_end;
+        break;
+      }
+
+      case url_body: {
+        switch (c) {
+          case '\0': {
+            state = start;
+            break;
+          }
+          case '\'':
+          case '"':
+          case '(': {
+            bad = true;
+            pop();
+            break;
+          }
+          case ')': {
+            text = std::string{anchor_url, static_cast<size_t>(cursor - anchor_url)};
+            pop();
+            go = false;
+            break;
+          }
+          case '\\': {
+            if (peek_is_escape()) {
+              consume_escape();
+              break;
+            }
+            bad = true;
+            break;
+          }
+          default: {
+            if (isspace(c)) {
+              text = std::string{anchor_url, static_cast<size_t>(cursor - anchor_url)};
+              state = white_space_end;
+              pop();
+              break;
+            }
+            pop();
+            break;
+          }
+        }
+        break;
+      }
+
+      /**
+       * consume as much as we can until we get to stopping point
+       * which is either right parent ( ) ) or EOF
+       */
+      case bad_url: {
+        bad = true;
+        switch (c) {
+          case '\0': {
+            go = false;
+            break;
+          }
+          case '\'': {
+            if (peek_is_escape()) {
+              consume_escape();
+              break;
+            }
+            break;
+          }
+          case ')': {
+            go = false;
+            break;
+          }
+        }
         break;
       }
     }
   } while (go);
+  if (bad) {
+    return token_t::make(url_pos, token_t::BAD_URL_TOKEN, std::move(text));
+  }
+  return token_t::make(url_pos, token_t::URL_TOKEN, std::move(text));
+}
 
-  return nullptr;
+std::string lexer_t::consume_string(char ending_point) {
+  const char *anchor_string = cursor;
+  do {
+    char c = peek();
+    enum {
+      start,
+      back_slash,
+    } state = start;
+    switch (state) {
+      case start: {
+        switch (c) {
+          case '\\': {
+            state = back_slash;
+            pop();
+            break;
+          }
+          case '\n': {
+            throw lexer_error_t(this, "unexpected new line in lex_string_token()::start");
+          }
+          case '\0': {
+            return std::string{anchor_string, static_cast<size_t>(cursor - anchor_string)};
+          }
+          default: {
+            if (c == ending_point) {
+              std::string result{anchor_string, static_cast<size_t>(cursor - anchor_string)};
+              pop();
+              return result;
+            }
+            pop();
+            break;
+          }
+        }
+        break;
+      }
+      case back_slash: {
+        switch (c) {
+          case '\n': {
+            pop();
+            state = start;
+            break;
+          }
+          default: {
+            if (peek_is_escape()) {
+              consume_escape();
+            } else {
+              pop();
+            }
+            state = start;
+            break;
+          }
+        }
+        break;
+      }
+    }
+  } while (true);
+}
+
+std::shared_ptr<token_t> lexer_t::lex_ident_token() {
+  set_anchor();
+  auto text = consume_name();
+  char c = peek();
+  if (text == "url" && c == '(') {
+    pop_anchor();
+    pop();
+    c = peek();
+    return lex_url_token();
+  } else if (c == '(') {
+    pop_anchor();
+    set_anchor();
+    pop();
+    peek();
+    auto left_paren_token = token_t::make(anchor_pos, token_t::DELIM_TOKEN, pop_anchor());
+    auto ident_token = token_t::make(anchor_pos, token_t::IDENT_TOKEN, std::move(text));
+    return function_token_t::make(*ident_token, *left_paren_token);
+  } else {
+    pop_anchor();
+    return token_t::make(anchor_pos, token_t::IDENT_TOKEN, std::move(text));
+  }
 }
 
 std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
@@ -607,8 +795,6 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
   enum {
     start,
     whitespace,
-    string_,
-    string_single,
     hash_start,
     dollar_start,
     asterisk_start,
@@ -626,6 +812,7 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
   bool go = true;
   do {
     char c = peek();
+
     switch (state) {
       case start: {
         switch (c) {
@@ -692,15 +879,19 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
             break;
           }
           case '"': {
-            state = string_;
-            set_anchor();
             pop();
+            peek();
+            auto string_pos = pos;
+            auto text = consume_string('"');
+            tokens.push_back(token_t::make(string_pos, token_t::STRING_TOKEN, std::move(text)));
             break;
           }
           case '\'': {
-            state = string_single;
-            set_anchor();
             pop();
+            peek();
+            auto string_pos = pos;
+            auto text = consume_string('\'');
+            tokens.push_back(token_t::make(string_pos, token_t::STRING_TOKEN, std::move(text)));
             break;
           }
           case '#': {
@@ -850,8 +1041,9 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
             break;
           }
         }
+
         reset_cursor(anchor);
-        c = peek();
+        pop_anchor();
         auto token = lex_ident_token();
         tokens.push_back(token);
         state = start;
@@ -1019,36 +1211,6 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
         pop_anchor();
         tokens.push_back(token_t::make(anchor_pos, token_t::WHITESPACE));
         state = start;
-        break;
-      }
-
-      case string_: {
-        if (c == '"') {
-          state = start;
-          pop();
-          c = peek();
-          auto text = pop_anchor();
-          tokens.push_back(token_t::make(anchor_pos, token_t::STRING_TOKEN, std::move(text)));
-        } else if (c == '\'') {
-          throw lexer_error_t(this, "unexpected new line in string string_");
-        } else {
-          pop();
-        }
-        break;
-      }
-
-      case string_single: {
-        if (c == '\'') {
-          state = start;
-          pop();
-          c = peek();
-          auto text = pop_anchor();
-          tokens.push_back(token_t::make(anchor_pos, token_t::STRING_TOKEN, std::move(text)));
-        } else if (c == '\'') {
-          throw lexer_error_t(this, "unexpected new line in string string_single");
-        } else {
-          pop();
-        }
         break;
       }
 

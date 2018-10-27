@@ -55,7 +55,7 @@ FIXTURE(simple_string) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::STRING_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
-  EXPECT_EQ(tokens[1]->get_text(), std::string("\"this is a string?\""));
+  EXPECT_EQ(tokens[1]->get_text(), std::string("this is a string?"));
 }
 
 FIXTURE(single_simple_string) {
@@ -66,7 +66,7 @@ FIXTURE(single_simple_string) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::STRING_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
-  EXPECT_EQ(tokens[1]->get_text(), std::string("'this is a string?'"));
+  EXPECT_EQ(tokens[1]->get_text(), std::string("this is a string?"));
 }
 
 FIXTURE(suffix_match_token) {

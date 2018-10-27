@@ -59,7 +59,10 @@ public:
     SEMICOLON,
     AT_KEYWORD_TOKEN,
     LEFT_BRACE,
-    RIGHT_BRACE
+    RIGHT_BRACE,
+    FUNCTION_TOKEN,
+    URL_TOKEN,
+    BAD_URL_TOKEN,
   };   // kind_t
 
   /* Cache the kind. */

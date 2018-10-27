@@ -59,6 +59,9 @@ std::string token_t::get_desc(token_t::kind_t kind) {
     case AT_KEYWORD_TOKEN: return "AT_KEYWORD_TOKEN";
     case LEFT_BRACE: return "LEFT_BRACE";
     case RIGHT_BRACE: return "RIGHT_BRACE";
+    case FUNCTION_TOKEN: return "FUNCTION_TOKEN";
+    case URL_TOKEN: return "URL_TOKEN";
+    case BAD_URL_TOKEN: return "BAD_URL_TOKEN";
   }
   return "unknown";
 }
