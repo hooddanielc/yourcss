@@ -56,6 +56,10 @@ public:
     DELIM_TOKEN,
     PERCENT_TOKEN,
     DIMENSION_TOKEN,
+    SEMICOLON,
+    AT_KEYWORD_TOKEN,
+    LEFT_BRACE,
+    RIGHT_BRACE
   };   // kind_t
 
   /* Cache the kind. */
@@ -85,8 +89,7 @@ public:
 
 protected:
 
-  /* Writes a human-readable dump of the token.  This is for debugging
-   purposes only. In production, a user never sees tokens directly. */
+  /* Writes a human-readable dump of the token. */
   friend std::ostream &operator<<(std::ostream &strm, const token_t &that);
 
   friend std::ostream &operator<<(std::ostream &strm, const token_t *that);

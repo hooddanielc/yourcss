@@ -55,6 +55,10 @@ std::string token_t::get_desc(token_t::kind_t kind) {
     case DELIM_TOKEN: return "DELIM_TOKEN";
     case PERCENT_TOKEN: return "PERCENT_TOKEN";
     case DIMENSION_TOKEN: return "DIMENSION_TOKEN";
+    case SEMICOLON: return "SEMICOLON";
+    case AT_KEYWORD_TOKEN: return "AT_KEYWORD_TOKEN";
+    case LEFT_BRACE: return "LEFT_BRACE";
+    case RIGHT_BRACE: return "RIGHT_BRACE";
   }
   return "unknown";
 }

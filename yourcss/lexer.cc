@@ -278,6 +278,10 @@ std::shared_ptr<token_t> lexer_t::lex_ident_token() {
   bool go = true;
   do {
     char c = peek();
+    // ghetto debug helper
+    // if (!isspace(c)) {
+    //   std::cout << " L: " << c << std::endl;
+    // }
     switch(state) {
       case start: {
         switch (c) {
@@ -499,6 +503,106 @@ std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
   return nullptr;
 }
 
+std::shared_ptr<token_t> lexer_t::lex_comment_token() {
+  set_anchor();
+  enum {
+    start,
+    slash_start,
+    comment_body,
+    asterisk_start,
+  } state = start;
+  bool go = true;
+  do {
+    char c = peek();
+    switch (state) {
+      case start: {
+        switch (c) {
+          case '/': {
+            state = slash_start;
+            pop();
+            break;
+          }
+          default: {
+            throw ice_t(pos, __FILE__, __LINE__);
+          }
+        }
+        break;
+      }
+      case slash_start: {
+        switch (c) {
+          case '*': {
+            state = comment_body;
+            pop();
+            break;
+          }
+          default: {
+            throw ice_t(pos, __FILE__, __LINE__);
+          }
+        }
+        break;
+      }
+      case comment_body: {
+        switch (c) {
+          case '*': {
+            state = asterisk_start;
+            pop();
+            break;
+          }
+          case '\0': {
+            auto text = pop_anchor();
+            return token_t::make(anchor_pos, token_t::COMMENT, std::move(text));
+          }
+          default: {
+            pop();
+            break;
+          }
+        }
+        break;
+      }
+      case asterisk_start: {
+        switch (c) {
+          case '/': {
+            pop();
+            c = peek();
+            auto text = pop_anchor();
+            return token_t::make(anchor_pos, token_t::COMMENT, std::move(text));
+          }
+          case '\0': {
+            auto text = pop_anchor();
+            return token_t::make(anchor_pos, token_t::COMMENT, std::move(text));
+          }
+          default: {
+            state = comment_body;
+            pop();
+            break;
+          }
+        }
+        break;
+      }
+    }
+  } while (go);
+  return nullptr;
+}
+
+std::shared_ptr<token_t> lexer_t::lex_at_keyword_token() {
+  set_anchor();
+  char c = peek();
+  if (c != '@') {
+    // expects @keyword token to be known
+    throw ice_t(pos, __FILE__, __LINE__);
+  }
+  pop();
+  auto text = pop_anchor();
+  auto at_token = token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text));
+  auto ident_token = lex_ident_token();
+  return at_keyword_token_t::make(*at_token, *ident_token);
+}
+
+std::string lexer_t::consume_unicode() {
+  // TODO
+  throw ice_t(pos, __FILE__, __LINE__);
+}
+
 std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
   enum {
     start,
@@ -510,17 +614,81 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
     asterisk_start,
     plus_start,
     minus_start,
+    period_start,
+    slash_start,
+    lesser_than_start,
+    at_start,
+    carrot_start,
+    unicode_start,
+    pipe_start,
+    tilde_start,
   } state = start;
   bool go = true;
   do {
     char c = peek();
     switch (state) {
-
       case start: {
         switch (c) {
+          case 'u':
+          case 'U': {
+            set_anchor();
+            state = unicode_start;
+            pop();
+            break;
+          }
           case '\0': {
             set_anchor();
             go = false;
+            break;
+          }
+          case '~': {
+            set_anchor();
+            state = tilde_start;
+            pop();
+            break;
+          }
+          case '\\': {
+            if (peek_is_escape()) {
+              auto token = lex_ident_token();
+            } else {
+              throw lexer_error_t(this, "unexpected escape character in lex()::start");
+            }
+            break;
+          }
+          case '|': {
+            set_anchor();
+            pop();
+            state = pipe_start;
+            break;
+          }
+          case '^': {
+            state = carrot_start;
+            set_anchor();
+            pop();
+            break;
+          }
+          case '{': {
+            add_single_token(token_t::LEFT_BRACE);
+            break;
+          }
+          case '}': {
+            add_single_token(token_t::RIGHT_BRACE);
+            break;
+          }
+          case '[': {
+            add_single_token(token_t::LEFT_BRACKET);
+            break;
+          }
+          case ']': {
+            add_single_token(token_t::RIGHT_BRACKET);
+            break;
+          }
+          case ':': {
+            add_single_token(token_t::COLON);
+            break;
+          }
+          case ';': {
+            add_single_token(token_t::SEMICOLON);
             break;
           }
           case '"': {
@@ -573,6 +741,34 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
             pop();
             break;
           }
+          case ',': {
+            add_single_token(token_t::COMMA);
+            break;
+          }
+          case '.': {
+            state = period_start;
+            set_anchor();
+            pop();
+            break;
+          }
+          case '/': {
+            state = slash_start;
+            set_anchor();
+            pop();
+            break;
+          }
+          case '<': {
+            state = lesser_than_start;
+            set_anchor();
+            pop();
+            break;
+          }
+          case '@': {
+            state = at_start;
+            set_anchor();
+            pop();
+            break;
+          }
           default: {
             if (isdigit(c)) {
               auto token = lex_numeric_token();
@@ -583,12 +779,174 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
               pop();
               state = whitespace;
               break;
+            } else if (is_name_start(c)) {
+              auto token = lex_ident_token();
+              tokens.push_back(token);
+              state = start;
+              break;
             } else {
-              std::string msg("unexpected character ");
-              msg += c;
-              throw lexer_error_t(this, msg.c_str());
+              std::string delimeter_text(cursor, size_t(1));
+              tokens.push_back(token_t::make(pos, token_t::DELIM_TOKEN, std::move(delimeter_text)));
+              break;
             }
           }
+        }
+        break;
+      }
+
+      case tilde_start: {
+        switch (c) {
+          case '=': {
+            pop();
+            auto text = pop_anchor();
+            tokens.push_back(token_t::make(anchor_pos, token_t::INCLUDE_MATCH_TOKEN, std::move(text)));
+            state = start;
+            break;
+          }
+          default: {
+            auto text = pop_anchor();
+            tokens.push_back(token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text)));
+            state = start;
+            break;
+          }
+        }
+        break;
+      }
+
+      case pipe_start: {
+        switch (c) {
+          case '=': {
+            pop();
+            auto text = pop_anchor();
+            tokens.push_back(token_t::make(anchor_pos, token_t::DASH_MATCH_TOKEN, std::move(text)));
+            state = start;
+            break;
+          }
+          case '|': {
+            pop();
+            auto text = pop_anchor();
+            tokens.push_back(token_t::make(anchor_pos, token_t::COLUMN_TOKEN, std::move(text)));
+            state = start;
+            break;
+          }
+          default: {
+            auto text = pop_anchor();
+            tokens.push_back(token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text)));
+            state = start;
+          }
+        }
+        break;
+      }
+
+      case unicode_start: {
+        if (c == '+') {
+          pop();
+          c = peek();
+          if (isdigit(c)) {
+            consume_unicode();
+            auto text = pop_anchor();
+            tokens.push_back(token_t::make(anchor_pos, token_t::UNICODE_RANGE_TOKEN, std::move(text)));
+            state = start;
+            break;
+          }
+        }
+        reset_cursor(anchor);
+        c = peek();
+        auto token = lex_ident_token();
+        tokens.push_back(token);
+        state = start;
+        break;
+      }
+
+      case carrot_start: {
+        if (c == '=') {
+          pop();
+          auto text = pop_anchor();
+          tokens.push_back(token_t::make(anchor_pos, token_t::PREFIX_MATCH_TOKEN, std::move(text)));
+          state = start;
+        } else {
+          auto text = pop_anchor();
+          tokens.push_back(token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text)));
+          state = start;
+        }
+        break;
+      }
+
+      case lesser_than_start: {
+        switch (c) {
+          case '!': {
+            pop();
+            c = peek();
+            if (c == '-') {
+              pop();
+              c = peek();
+              if (c == '-') {
+                pop();
+                auto text = pop_anchor();
+                tokens.push_back(token_t::make(anchor_pos, token_t::CDO_TOKEN, std::move(text)));
+                state = start;
+                break;
+              }
+            }
+            reset_cursor(anchor);
+            pop();
+            auto text = pop_anchor();
+            auto token = token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text));
+            tokens.push_back(token);
+            break;
+          }
+          default: {
+            auto text = pop_anchor();
+            auto token = token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text));
+            tokens.push_back(token);
+            state = start;
+            break;
+          }
+        }
+        break;
+      }
+
+      case at_start: {
+        if (peek_is_identifier()) {
+          reset_cursor(anchor);
+          pop_anchor();
+          auto token = lex_at_keyword_token();
+          tokens.push_back(token);
+          state = start;
+        } else {
+          auto text = pop_anchor();
+          tokens.push_back(token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text)));
+          state = start;
+        }
+        break;
+      }
+
+      case slash_start: {
+        if (c == '*') {
+          reset_cursor(anchor);
+          pop_anchor();
+          auto token = lex_comment_token();
+          tokens.push_back(token);
+          state = start;
+        } else {
+          auto text = pop_anchor();
+          tokens.push_back(token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text)));
+          state = start;
+        }
+        break;
+      }
+
+      case period_start: {
+        if (isdigit(c)) {
+          reset_cursor(anchor);
+          pop_anchor();
+          auto token = lex_numeric_token();
+          tokens.push_back(token);
+          state = start;
+        } else {
+          auto text = pop_anchor();
+          tokens.push_back(token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text)));
+          state = start;
         }
         break;
       }
