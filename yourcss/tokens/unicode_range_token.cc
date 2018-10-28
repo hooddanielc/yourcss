@@ -19,4 +19,6 @@ std::shared_ptr<unicode_range_token_t> unicode_range_token_t::make(const token_t
   return std::make_shared<unicode_range_token_t>(start, end);
 }
 
+unicode_range_token_t::~unicode_range_token_t() {}
+
 }

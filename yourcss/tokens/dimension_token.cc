@@ -19,4 +19,6 @@ std::shared_ptr<dimension_token_t> dimension_token_t::make(const token_t &number
   return std::make_shared<dimension_token_t>(number, identifier);
 }
 
+dimension_token_t::~dimension_token_t() {};
+
 }

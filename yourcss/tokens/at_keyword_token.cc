@@ -19,4 +19,6 @@ std::shared_ptr<at_keyword_token_t> at_keyword_token_t::make(const token_t &at, 
   return std::make_shared<at_keyword_token_t>(at, identifier);
 }
 
+at_keyword_token_t::~at_keyword_token_t() {};
+
 }

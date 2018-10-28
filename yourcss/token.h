@@ -60,7 +60,16 @@ public:
     LEFT_BRACE_TOKEN,
     RIGHT_BRACE_TOKEN,
     COMMENT_TOKEN,
-  };   // kind_t
+  };  // kind_t
+
+  /* The type flag. */
+  enum type_flag_t {
+    UNKNOWN,
+    UNRESTRICTED,
+    ID,
+    INTEGER,
+    NUMBER,
+  };  // type_t
 
   /* Cache the kind. */
   token_t(kind_t kind);
@@ -77,15 +86,26 @@ public:
 
   std::string get_text() const;
 
+  /* Returns kind as a string */
   std::string get_name() const;
 
   pos_t get_pos() const;
+
+  /* The tokens sub type */
+  token_t::type_flag_t get_type_flag() const;
+
+  void set_type_flag(type_flag_t flag);
+
+  /* Returns type_flag as a string */
+  std::string get_type_flag_name() const;
 
   static std::shared_ptr<token_t> make(kind_t kind);
 
   static std::shared_ptr<token_t> make(const pos_t &pos, kind_t kind);
 
   static std::shared_ptr<token_t> make(const pos_t &pos, kind_t kind, std::string &&text);
+
+  virtual ~token_t();
 
 protected:
 
@@ -102,6 +122,9 @@ protected:
 
   /* See accessor. */
   std::string text;
+
+  /* See accessor */
+  type_flag_t type_flag;
 
 };  // token_t
 

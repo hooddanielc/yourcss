@@ -14,6 +14,8 @@ public:
 
   static std::shared_ptr<unicode_range_token_t> make(const token_t &start, const token_t &end);
 
+  virtual ~unicode_range_token_t();
+
 private:
 
   token_t start;

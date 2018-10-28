@@ -14,6 +14,7 @@
 #include "tokens/at_keyword_token.h"
 #include "tokens/function_token.h"
 #include "tokens/unicode_range_token.h"
+#include "tokens/number_token.h"
 namespace yourcss {
 
 /* Convert source text into a vector of tokens. */

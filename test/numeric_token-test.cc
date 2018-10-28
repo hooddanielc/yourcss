@@ -13,6 +13,8 @@ FIXTURE(regular_number) {
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("123"));
+  number_token_t *number = dynamic_cast<number_token_t*>(tokens[1].get());
+  EXPECT_TRUE(number->get_value() == double(123.0));
 }
 
 FIXTURE(negative_number) {
@@ -24,6 +26,8 @@ FIXTURE(negative_number) {
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-123"));
+  number_token_t *number = dynamic_cast<number_token_t*>(tokens[1].get());
+  EXPECT_TRUE(number->get_value() == double(-123.0));
 }
 
 FIXTURE(positive_number) {
@@ -35,6 +39,8 @@ FIXTURE(positive_number) {
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("+123"));
+  number_token_t *number = dynamic_cast<number_token_t*>(tokens[1].get());
+  EXPECT_TRUE(number->get_value() == double(123.0));
 }
 
 FIXTURE(decimal) {
@@ -46,6 +52,8 @@ FIXTURE(decimal) {
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("123.3"));
+  number_token_t *number = dynamic_cast<number_token_t*>(tokens[1].get());
+  EXPECT_TRUE(number->get_value() == double(123.3));
 }
 
 FIXTURE(neg_decimal) {
@@ -57,6 +65,8 @@ FIXTURE(neg_decimal) {
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-123.3"));
+  number_token_t *number = dynamic_cast<number_token_t*>(tokens[1].get());
+  EXPECT_TRUE(number->get_value() == double(-123.3));
 }
 
 FIXTURE(neg_start_decimal) {
@@ -68,6 +78,8 @@ FIXTURE(neg_start_decimal) {
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-.3"));
+  number_token_t *number = dynamic_cast<number_token_t*>(tokens[1].get());
+  EXPECT_TRUE(number->get_value() == double(-0.3));
 }
 
 FIXTURE(exponent) {
@@ -79,6 +91,8 @@ FIXTURE(exponent) {
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("3e3"));
+  number_token_t *number = dynamic_cast<number_token_t*>(tokens[1].get());
+  EXPECT_TRUE(number->get_value() == double(3000.0));
 }
 
 FIXTURE(neg_exponent) {
@@ -90,6 +104,8 @@ FIXTURE(neg_exponent) {
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-3e3"));
+  number_token_t *number = dynamic_cast<number_token_t*>(tokens[1].get());
+  EXPECT_TRUE(number->get_value() == double(-3000.0f));
 }
 
 FIXTURE(pos_exponent) {
@@ -101,6 +117,8 @@ FIXTURE(pos_exponent) {
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("+3e3"));
+  number_token_t *number = dynamic_cast<number_token_t*>(tokens[1].get());
+  EXPECT_TRUE(number->get_value() == double(3000.0f));
 }
 
 FIXTURE(pos_exponent_pos) {

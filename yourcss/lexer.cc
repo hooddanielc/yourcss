@@ -542,6 +542,7 @@ std::shared_ptr<token_t> lexer_t::lex_ident_token() {
 
 std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
   // dimension token
+  auto flag = token_t::type_flag_t::INTEGER;
   set_anchor();
   std::shared_ptr<token_t> temp_number_token;
   std::shared_ptr<token_t> temp_identifier;
@@ -589,6 +590,7 @@ std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
 
       case start_mod: {
         if (c == '.') {
+          flag = token_t::type_flag_t::NUMBER;
           pop();
           state = point;
           break;
@@ -608,13 +610,8 @@ std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
         }
         switch (c) {
           case '.': {
+            flag = token_t::type_flag_t::NUMBER;
             state = point;
-            pop();
-            break;
-          }
-          case 'e':
-          case 'E': {
-            state = exponent;
             pop();
             break;
           }
@@ -624,15 +621,44 @@ std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
             break;
           }
           default: {
+            if (c == 'e' || c == 'E') {
+              state = exponent;
+              
+              ++cursor;
+              if (*cursor == '+' || *cursor == '-') {
+                ++cursor;
+                if (isdigit(*cursor)) {
+                  state = exponent;
+                  flag = token_t::type_flag_t::NUMBER;
+                  --cursor;
+                  --cursor;
+                  pop();
+                  break;
+                }
+                --cursor;
+              } else if (isdigit(*cursor)) {
+                state = exponent;
+                flag = token_t::type_flag_t::NUMBER;
+                --cursor;
+                pop();
+                break;
+              }
+              --cursor;
+            }
             if (peek_is_identifier()) {
               auto text = pop_anchor();
-              auto number = token_t::make(anchor_pos, token_t::NUMBER_TOKEN, std::move(text));
+              double num_value = stod(text);
+              auto number = number_token_t::make(anchor_pos, token_t::NUMBER_TOKEN, std::move(text), num_value);
+              number->set_type_flag(flag);
               auto identifier = lex_ident_token();
               auto token = dimension_token_t::make(*number, *identifier);
               return std::move(token);
             } else {
               auto text = pop_anchor();
-              return token_t::make(anchor_pos, token_t::NUMBER_TOKEN, std::move(text));
+              double num_value = stod(text);
+              auto token = number_token_t::make(anchor_pos, token_t::NUMBER_TOKEN, std::move(text), num_value);
+              token->set_type_flag(flag);
+              return std::move(token);
             }
           }
         }
@@ -643,6 +669,7 @@ std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
         if (consumed_point) {
           throw lexer_error_t(this, "unexpected extra point in lex_numeric_token()::point");
         }
+        flag = token_t::type_flag_t::NUMBER;
         consumed_point = true;
         if (isdigit(c)) {
           state = number;
@@ -688,8 +715,10 @@ std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
       case percent: {
         pop();
         auto text = pop_anchor();
-        auto token = token_t::make(anchor_pos, token_t::PERCENTAGE_TOKEN, std::move(text));
-        return token;
+        double num = stod(text);
+        auto token = number_token_t::make(anchor_pos, token_t::PERCENTAGE_TOKEN, std::move(text), num);
+        token->set_type_flag(flag);
+        return std::move(token);
       }
     }
   } while (go);
@@ -880,8 +909,12 @@ std::shared_ptr<token_t> lexer_t::lex_unicode_range() {
       }
     }
   } while (go);
-  auto start_hex_token = token_t::make(start_pos, token_t::NUMBER_TOKEN, std::move(hex_start_text));
-  auto end_hex_token = token_t::make(end_pos, token_t::NUMBER_TOKEN, std::move(hex_end_text));
+  int num_start = stoi(hex_start_text, nullptr, 16);
+  int num_end = stoi(hex_end_text, nullptr, 16);
+  auto start_hex_token = number_token_t::make(start_pos, token_t::NUMBER_TOKEN, std::move(hex_start_text), static_cast<double>(num_start));
+  auto end_hex_token = number_token_t::make(end_pos, token_t::NUMBER_TOKEN, std::move(hex_end_text), static_cast<double>(num_end));
+  start_hex_token->set_type_flag(token_t::type_flag_t::INTEGER);
+  end_hex_token->set_type_flag(token_t::type_flag_t::INTEGER);
   return unicode_range_token_t::make(*start_hex_token, *end_hex_token);
 }
 

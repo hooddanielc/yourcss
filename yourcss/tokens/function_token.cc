@@ -19,4 +19,6 @@ std::shared_ptr<function_token_t> function_token_t::make(const token_t &at, cons
   return std::make_shared<function_token_t>(at, identifier);
 }
 
+function_token_t::~function_token_t() {};
+
 }

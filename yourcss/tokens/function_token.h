@@ -14,6 +14,8 @@ public:
 
   static std::shared_ptr<function_token_t> make(const token_t &identifier_, const token_t &left_paren_);
 
+  virtual ~function_token_t();
+
 private:
 
   token_t identifier;

@@ -14,6 +14,8 @@ public:
 
   static std::shared_ptr<dimension_token_t> make(const token_t &number, const token_t &identifier);
 
+  virtual ~dimension_token_t();
+
 private:
 
   token_t number;

@@ -14,6 +14,8 @@ public:
 
   static std::shared_ptr<at_keyword_token_t> make(const token_t &at, const token_t &identifier);
 
+  virtual ~at_keyword_token_t();
+
 private:
 
   token_t at;
