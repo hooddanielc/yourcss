@@ -93,6 +93,9 @@ public:
   /* Is valid escape */
   bool is_valid_escape();
 
+  /* If true comments are not returned during tokenization */
+  void set_discard_comments(bool);
+
 private:
 
   /* Return the current character from the source text but don't advance to
@@ -119,6 +122,9 @@ private:
 
   /* Temporarily holds tokens while lexing */
   std::vector<std::shared_ptr<token_t>> tokens;
+
+  /* Should comments be ignored? Defaults to true */
+  bool discard_comments;
 
   /* Our next position within the source text. */
   mutable const char *next_cursor;

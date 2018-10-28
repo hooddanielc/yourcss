@@ -9,9 +9,9 @@ FIXTURE(regular_number) {
     123
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("123"));
 }
 
@@ -20,9 +20,9 @@ FIXTURE(negative_number) {
     -123
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-123"));
 }
 
@@ -31,9 +31,9 @@ FIXTURE(positive_number) {
     +123
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("+123"));
 }
 
@@ -42,9 +42,9 @@ FIXTURE(decimal) {
     123.3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("123.3"));
 }
 
@@ -53,9 +53,9 @@ FIXTURE(neg_decimal) {
     -123.3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-123.3"));
 }
 
@@ -64,9 +64,9 @@ FIXTURE(neg_start_decimal) {
     -.3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-.3"));
 }
 
@@ -75,9 +75,9 @@ FIXTURE(exponent) {
     3e3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("3e3"));
 }
 
@@ -86,9 +86,9 @@ FIXTURE(neg_exponent) {
     -3e3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-3e3"));
 }
 
@@ -97,9 +97,9 @@ FIXTURE(pos_exponent) {
     +3e3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("+3e3"));
 }
 
@@ -108,9 +108,9 @@ FIXTURE(pos_exponent_pos) {
     +3e+3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("+3e+3"));
 }
 
@@ -119,9 +119,9 @@ FIXTURE(neg_exponent_pos) {
     -3e+3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-3e+3"));
 }
 
@@ -130,9 +130,9 @@ FIXTURE(neg_exponent_neg) {
     -3e-3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-3e-3"));
 }
 
@@ -141,9 +141,9 @@ FIXTURE(dec_exponent) {
     3.3e3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("3.3e3"));
 }
 
@@ -152,9 +152,9 @@ FIXTURE(pos_dec_exponent) {
     +3.3e3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("+3.3e3"));
 }
 
@@ -163,9 +163,9 @@ FIXTURE(neg_dec_exponent) {
     -3.3e3
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-3.3e3"));
 }
 
@@ -174,9 +174,9 @@ FIXTURE(dimension_token) {
     123px
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::DIMENSION_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("123px"));
 }
 
@@ -185,9 +185,9 @@ FIXTURE(identifier_token_negative) {
     -123px
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::DIMENSION_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-123px"));
 }
 
@@ -196,9 +196,9 @@ FIXTURE(identifier_token_positive) {
     +123px
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::DIMENSION_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("+123px"));
 }
 
@@ -207,9 +207,9 @@ FIXTURE(dimension_decimal) {
     123.3px
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::DIMENSION_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("123.3px"));
 }
 
@@ -218,9 +218,9 @@ FIXTURE(neg_dimension_decimal) {
     -123.3px
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::DIMENSION_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("-123.3px"));
 }
 
@@ -229,9 +229,9 @@ FIXTURE(pos_dimension_decimal) {
     +123.3px
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::DIMENSION_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("+123.3px"));
 }
 
@@ -240,9 +240,9 @@ FIXTURE(dimension_token_dash_name) {
     123-cool-px
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::DIMENSION_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("123-cool-px"));
 }
 
@@ -251,8 +251,8 @@ FIXTURE(dimension_weird_escaped_name) {
     123-moz\*cool
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::DIMENSION_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("123-moz\\*cool"));
 }

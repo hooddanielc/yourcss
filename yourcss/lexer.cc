@@ -20,6 +20,7 @@ void lexer_t::print_tokens(const std::vector<std::shared_ptr<token_t>> &tokens) 
 }
 
 lexer_t::lexer_t(const char *next_cursor_):
+  discard_comments(true),
   next_cursor(next_cursor_),
   is_ready(false),
   anchor(nullptr) {}
@@ -45,6 +46,10 @@ char lexer_t::peek() const {
     is_ready = true;
   }
   return *cursor;
+}
+
+void lexer_t::set_discard_comments(bool discard_comments_) {
+  discard_comments = discard_comments_;
 }
 
 char lexer_t::reset_cursor(const char *saved_cursor) {
@@ -683,7 +688,7 @@ std::shared_ptr<token_t> lexer_t::lex_numeric_token() {
       case percent: {
         pop();
         auto text = pop_anchor();
-        auto token = token_t::make(anchor_pos, token_t::PERCENT_TOKEN, std::move(text));
+        auto token = token_t::make(anchor_pos, token_t::PERCENTAGE_TOKEN, std::move(text));
         return token;
       }
     }
@@ -738,7 +743,7 @@ std::shared_ptr<token_t> lexer_t::lex_comment_token() {
           }
           case '\0': {
             auto text = pop_anchor();
-            return token_t::make(anchor_pos, token_t::COMMENT, std::move(text));
+            return token_t::make(anchor_pos, token_t::COMMENT_TOKEN, std::move(text));
           }
           default: {
             pop();
@@ -753,11 +758,11 @@ std::shared_ptr<token_t> lexer_t::lex_comment_token() {
             pop();
             c = peek();
             auto text = pop_anchor();
-            return token_t::make(anchor_pos, token_t::COMMENT, std::move(text));
+            return token_t::make(anchor_pos, token_t::COMMENT_TOKEN, std::move(text));
           }
           case '\0': {
             auto text = pop_anchor();
-            return token_t::make(anchor_pos, token_t::COMMENT, std::move(text));
+            return token_t::make(anchor_pos, token_t::COMMENT_TOKEN, std::move(text));
           }
           default: {
             state = comment_body;
@@ -944,27 +949,27 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
             break;
           }
           case '{': {
-            add_single_token(token_t::LEFT_BRACE);
+            add_single_token(token_t::LEFT_BRACE_TOKEN);
             break;
           }
           case '}': {
-            add_single_token(token_t::RIGHT_BRACE);
+            add_single_token(token_t::RIGHT_BRACE_TOKEN);
             break;
           }
           case '[': {
-            add_single_token(token_t::LEFT_BRACKET);
+            add_single_token(token_t::LEFT_BRACKET_TOKEN);
             break;
           }
           case ']': {
-            add_single_token(token_t::RIGHT_BRACKET);
+            add_single_token(token_t::RIGHT_BRACKET_TOKEN);
             break;
           }
           case ':': {
-            add_single_token(token_t::COLON);
+            add_single_token(token_t::COLON_TOKEN);
             break;
           }
           case ';': {
-            add_single_token(token_t::SEMICOLON);
+            add_single_token(token_t::SEMICOLON_TOKEN);
             break;
           }
           case '"': {
@@ -996,11 +1001,11 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
             break;
           }
           case '(': {
-            add_single_token(token_t::LEFT_PAREN);
+            add_single_token(token_t::LEFT_PAREN_TOKEN);
             break;
           }
           case ')': {
-            add_single_token(token_t::RIGHT_PAREN);
+            add_single_token(token_t::RIGHT_PAREN_TOKEN);
             break;
           }
           case '*': {
@@ -1022,7 +1027,7 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
             break;
           }
           case ',': {
-            add_single_token(token_t::COMMA);
+            add_single_token(token_t::COMMA_TOKEN);
             break;
           }
           case '.': {
@@ -1207,7 +1212,9 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
           reset_cursor(anchor);
           pop_anchor();
           auto token = lex_comment_token();
-          tokens.push_back(token);
+          if (!discard_comments) {
+            tokens.push_back(token);
+          }
           state = start;
         } else {
           auto text = pop_anchor();
@@ -1315,7 +1322,7 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
           break;
         }
         pop_anchor();
-        tokens.push_back(token_t::make(anchor_pos, token_t::WHITESPACE));
+        tokens.push_back(token_t::make(anchor_pos, token_t::WHITESPACE_TOKEN));
         state = start;
         break;
       }

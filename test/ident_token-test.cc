@@ -9,9 +9,9 @@ FIXTURE(identifier) {
     happyfaces
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::IDENT_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("happyfaces"));
 }
 
@@ -20,7 +20,7 @@ FIXTURE(function_identifier) {
     happyfaces(123, 123, 123);
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::FUNCTION_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::NUMBER_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("happyfaces("));
@@ -32,9 +32,9 @@ FIXTURE(url_identifier) {
     url(http://danielhood.com);
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::URL_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::SEMICOLON, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
@@ -43,9 +43,9 @@ FIXTURE(url_identifier_white_beg) {
     url( http://danielhood.com);
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::URL_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::SEMICOLON, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
@@ -54,9 +54,9 @@ FIXTURE(url_identifier_white_end) {
     url(http://danielhood.com );
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::URL_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::SEMICOLON, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
@@ -65,9 +65,9 @@ FIXTURE(url_identifier_single_quote) {
     url('http://danielhood.com');
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::URL_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::SEMICOLON, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
@@ -76,9 +76,9 @@ FIXTURE(url_identifier_single_quote_ws_begin) {
     url( 'http://danielhood.com');
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::URL_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::SEMICOLON, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
@@ -87,9 +87,9 @@ FIXTURE(url_identifier_single_quote_ws_end) {
     url('http://danielhood.com' );
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::URL_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::SEMICOLON, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
@@ -98,9 +98,9 @@ FIXTURE(url_identifier_single_quote_ws) {
     url(   'http://danielhood.com' );
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::URL_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::SEMICOLON, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
@@ -109,9 +109,9 @@ FIXTURE(url_identifier_double_quote_ws) {
     url( "http://danielhood.com" );
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::URL_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::SEMICOLON, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
@@ -120,8 +120,8 @@ FIXTURE(url_identifier_double_quote_ws_nice) {
     url("http://danielhood.com");
   )";
   auto tokens = lexer_t(src).lex();
-  EXPECT_EQ(token_t::kind_t::WHITESPACE, tokens[0]->get_kind());
+  EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[0]->get_kind());
   EXPECT_EQ(token_t::kind_t::URL_TOKEN, tokens[1]->get_kind());
-  EXPECT_EQ(token_t::kind_t::SEMICOLON, tokens[2]->get_kind());
+  EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }

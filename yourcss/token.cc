@@ -13,57 +13,39 @@ token_t::token_t(const pos_t &pos_, token_t::kind_t kind_, std::string &&text_):
 
 std::string token_t::get_desc(token_t::kind_t kind) {
   switch(kind) {
-    case PERIOD: return "PERIOD";
-    case ANY_VALUE: return "ANY_VALUE";
-    case WHITESPACE: return "WHITESPACE";
-    case DOLLAR: return "DOLLAR";
-    case HASH_TOKEN: return "HASH_TOKEN";
-    case COMMENT: return "COMMENT";
-    case LEFT_PAREN: return "LEFT_PAREN";
-    case CARET: return "CARET";
-    case LESSER_THEN: return "LESSER_THEN";
-    case NEWLINE: return "NEWLINE";
-    case COMMA: return "COMMA";
-    case TAB: return "TAB";
-    case PLUS: return "PLUS";
     case IDENT_TOKEN: return "IDENT_TOKEN";
-    case RIGHT_BRACKET: return "RIGHT_BRACKET";
-    case RIGHT_PAREN: return "RIGHT_PAREN";
-    case GREATER_THAN: return "GREATER_THAN";
-    case COLUMN_TOKEN: return "COLUMN_TOKEN";
-    case TILDE: return "TILDE";
-    case HEX_DIGIT: return "HEX_DIGIT";
-    case CDC_TOKEN: return "CDC_TOKEN";
-    case PIPE: return "PIPE";
-    case ESCAPE: return "ESCAPE";
-    case ASTERISK: return "ASTERISK";
-    case STRING_TOKEN: return "STRING_TOKEN";
-    case NUMBER_TOKEN: return "NUMBER_TOKEN";
-    case UNICODE_RANGE_TOKEN: return "UNICODE_RANGE_TOKEN";
-    case INCLUDE_MATCH_TOKEN: return "INCLUDE_MATCH_TOKEN";
-    case PREFIX_MATCH_TOKEN: return "PREFIX_MATCH_TOKEN";
-    case COLON: return "COLON";
-    case DASH_MATCH_TOKEN: return "DASH_MATCH_TOKEN";
-    case PERCENT: return "PERCENT";
-    case LETTER_I: return "LETTER_I";
-    case SUFFIX_MATCH_TOKEN: return "SUFFIX_MATCH_TOKEN";
-    case LEFT_BRACKET: return "LEFT_BRACKET";
-    case EQUALS: return "EQUALS";
-    case CDO_TOKEN: return "CDO_TOKEN";
-    case SUBSTRING_MATCH_TOKEN: return "SUBSTRING_MATCH_TOKEN";
-    case AT: return "AT";
-    case DELIM_TOKEN: return "DELIM_TOKEN";
-    case PERCENT_TOKEN: return "PERCENT_TOKEN";
-    case DIMENSION_TOKEN: return "DIMENSION_TOKEN";
-    case SEMICOLON: return "SEMICOLON";
-    case AT_KEYWORD_TOKEN: return "AT_KEYWORD_TOKEN";
-    case LEFT_BRACE: return "LEFT_BRACE";
-    case RIGHT_BRACE: return "RIGHT_BRACE";
     case FUNCTION_TOKEN: return "FUNCTION_TOKEN";
+    case AT_KEYWORD_TOKEN: return "AT_KEYWORD_TOKEN";
+    case HASH_TOKEN: return "HASH_TOKEN";
+    case STRING_TOKEN: return "STRING_TOKEN";
+    case BAD_STRING_TOKEN: return "BAD_STRING_TOKEN";
     case URL_TOKEN: return "URL_TOKEN";
     case BAD_URL_TOKEN: return "BAD_URL_TOKEN";
+    case DELIM_TOKEN: return "DELIM_TOKEN";
+    case NUMBER_TOKEN: return "NUMBER_TOKEN";
+    case PERCENTAGE_TOKEN: return "PERCENTAGE_TOKEN";
+    case DIMENSION_TOKEN: return "DIMENSION_TOKEN";
+    case UNICODE_RANGE_TOKEN: return "UNICODE_RANGE_TOKEN";
+    case INCLUDE_MATCH_TOKEN: return "INCLUDE_MATCH_TOKEN";
+    case DASH_MATCH_TOKEN: return "DASH_MATCH_TOKEN";
+    case PREFIX_MATCH_TOKEN: return "PREFIX_MATCH_TOKEN";
+    case SUFFIX_MATCH_TOKEN: return "SUFFIX_MATCH_TOKEN";
+    case SUBSTRING_MATCH_TOKEN: return "SUBSTRING_MATCH_TOKEN";
+    case COLUMN_TOKEN: return "COLUMN_TOKEN";
+    case WHITESPACE_TOKEN: return "WHITESPACE_TOKEN";
+    case CDO_TOKEN: return "CDO_TOKEN";
+    case CDC_TOKEN: return "CDC_TOKEN";
+    case COLON_TOKEN: return "COLON_TOKEN";
+    case SEMICOLON_TOKEN: return "SEMICOLON_TOKEN";
+    case COMMA_TOKEN: return "COMMA_TOKEN";
+    case LEFT_BRACKET_TOKEN: return "LEFT_BRACKET_TOKEN";
+    case RIGHT_BRACKET_TOKEN: return "RIGHT_BRACKET_TOKEN";
+    case LEFT_PAREN_TOKEN: return "LEFT_PAREN_TOKEN";
+    case RIGHT_PAREN_TOKEN: return "RIGHT_PAREN_TOKEN";
+    case LEFT_BRACE_TOKEN: return "LEFT_BRACE_TOKEN";
+    case RIGHT_BRACE_TOKEN: return "RIGHT_BRACE_TOKEN";
+    case COMMENT_TOKEN: return "COMMENT_TOKEN";
   }
-  return "unknown";
 }
 
 token_t::kind_t token_t::get_kind() const {

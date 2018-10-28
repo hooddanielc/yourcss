@@ -9,60 +9,57 @@
 
 namespace yourcss {
 
+
+/**
+ * The output of the tokenization step is a stream of zero or more of the
+ * following tokens:
+ *
+ * <ident-token>, <function-token>, <at-keyword-token>, <hash-token>,
+ * <string-token>, <bad-string-token>, <url-token>, <bad-url-token>, <delim-token>,
+ * <number-token>, <percentage-token>, <dimension-token>, <unicode-range-token>,
+ * <include-match-token>, <dash-match-token>, <prefix-match-token>, <suffix-match-token>,
+ * <substring-match-token>, <column-token>, <whitespace-token>, <CDO-token>, <CDC-token>,
+ * <colon-token>, <semicolon-token>, <comma-token>, <[-token>, <]-token>, <(-token>,
+ * <)-token>, <{-token>, and <}-token>.
+ */
+
 class token_t {
 
 public:
 
   enum kind_t {
-    PERIOD,
-    ANY_VALUE,
-    WHITESPACE,
-    DOLLAR,
-    HASH_TOKEN,
-    COMMENT,
-    LEFT_PAREN,
-    CARET,
-    LESSER_THEN,
-    NEWLINE,
-    COMMA,
-    TAB,
-    PLUS,
     IDENT_TOKEN,
-    RIGHT_BRACKET,
-    RIGHT_PAREN,
-    GREATER_THAN,
-    COLUMN_TOKEN,
-    TILDE,
-    HEX_DIGIT,
-    CDC_TOKEN,
-    PIPE,
-    ESCAPE,
-    ASTERISK,
-    STRING_TOKEN,
-    NUMBER_TOKEN,
-    UNICODE_RANGE_TOKEN,
-    INCLUDE_MATCH_TOKEN,
-    PREFIX_MATCH_TOKEN,
-    COLON,
-    DASH_MATCH_TOKEN,
-    PERCENT,
-    LETTER_I,
-    SUFFIX_MATCH_TOKEN,
-    LEFT_BRACKET,
-    EQUALS,
-    CDO_TOKEN,
-    SUBSTRING_MATCH_TOKEN,
-    AT,
-    DELIM_TOKEN,
-    PERCENT_TOKEN,
-    DIMENSION_TOKEN,
-    SEMICOLON,
-    AT_KEYWORD_TOKEN,
-    LEFT_BRACE,
-    RIGHT_BRACE,
     FUNCTION_TOKEN,
+    AT_KEYWORD_TOKEN,
+    HASH_TOKEN,
+    STRING_TOKEN,
+    BAD_STRING_TOKEN,
     URL_TOKEN,
     BAD_URL_TOKEN,
+    DELIM_TOKEN,
+    NUMBER_TOKEN,
+    PERCENTAGE_TOKEN,
+    DIMENSION_TOKEN,
+    UNICODE_RANGE_TOKEN,
+    INCLUDE_MATCH_TOKEN,
+    DASH_MATCH_TOKEN,
+    PREFIX_MATCH_TOKEN,
+    SUFFIX_MATCH_TOKEN,
+    SUBSTRING_MATCH_TOKEN,
+    COLUMN_TOKEN,
+    WHITESPACE_TOKEN,
+    CDO_TOKEN,
+    CDC_TOKEN,
+    COLON_TOKEN,
+    SEMICOLON_TOKEN,
+    COMMA_TOKEN,
+    LEFT_BRACKET_TOKEN,
+    RIGHT_BRACKET_TOKEN,
+    LEFT_PAREN_TOKEN,
+    RIGHT_PAREN_TOKEN,
+    LEFT_BRACE_TOKEN,
+    RIGHT_BRACE_TOKEN,
+    COMMENT_TOKEN,
   };   // kind_t
 
   /* Cache the kind. */
