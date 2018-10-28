@@ -786,9 +786,98 @@ std::shared_ptr<token_t> lexer_t::lex_at_keyword_token() {
   return at_keyword_token_t::make(*at_token, *ident_token);
 }
 
-std::string lexer_t::consume_unicode() {
-  // TODO
-  throw ice_t(pos, __FILE__, __LINE__);
+std::shared_ptr<token_t> lexer_t::lex_unicode_range() {
+  const char *anchor_start = cursor;
+  const char *anchor_end = nullptr;
+  pos_t start_pos = pos;
+  pos_t end_pos = pos;
+  std::string hex_start_text;
+  std::string hex_end_text;
+  int num_consumed = 0;
+  enum {
+    start,
+    hex_start,
+    hex_end,
+    question_range,
+  } state = start;
+  bool go = true;
+  do {
+    char c = peek();
+    switch (state) {
+      case start: {
+        if (isxdigit(c)) {
+          pop();
+          c = peek();
+          if (++num_consumed == 6) {
+            hex_start_text = std::string{anchor_start, static_cast<size_t>(cursor - anchor_start)};
+            state = hex_start;
+          }
+        } else if (c == '?') {
+          pop();
+          if (++num_consumed == 6) {
+            state = question_range;
+          }
+        } else {
+          throw lexer_error_t(this, "unexpected character in consume_unicode_range()::start");
+        }
+        break;
+      }
+      case hex_start: {
+        if (c == '-') {
+          const char *reset = cursor;
+          pop();
+          c = peek();
+          if (isxdigit(c)) {
+            end_pos = pos;
+            anchor_end = cursor;
+            state = hex_end;
+            num_consumed = 0;
+          } else {
+            reset_cursor(reset);
+            hex_end_text = hex_start_text;
+            go = false;
+          }
+        } else {
+          hex_end_text = hex_start_text;
+          go = false;
+        }
+        break;
+      }
+      case hex_end: {
+        if (isxdigit(c)) {
+          pop();
+          c = peek();
+          if (++num_consumed == 6) {
+            hex_end_text = std::string{anchor_end, static_cast<size_t>(cursor - anchor_end)};
+            go = false;
+          }
+        } else {
+          throw lexer_error_t(this, "unexpected character in consume_unicode_range()::hex_end");
+        }
+        break;
+      }
+      case question_range: {
+        // interpret '?' as '0' for start
+        // interpret '?' as 'f' for end
+        for (int i = 0; i < 6; ++i) {
+          char cc = *anchor_start;
+          if (cc == '?') {
+            hex_start_text += '0';
+            hex_end_text += 'f';
+          } else {
+            hex_start_text += cc;
+            hex_end_text += cc;
+          }
+          anchor_start++;
+        }
+        go = false;
+        break;
+      }
+    }
+  } while (go);
+  auto start_hex_token = token_t::make(start_pos, token_t::NUMBER_TOKEN, std::move(hex_start_text));
+  auto end_hex_token = token_t::make(end_pos, token_t::NUMBER_TOKEN, std::move(hex_end_text));
+  return unicode_range_token_t::make(*start_hex_token, *end_hex_token);
 }
 
 std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
@@ -1033,10 +1122,10 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
         if (c == '+') {
           pop();
           c = peek();
-          if (isdigit(c)) {
-            consume_unicode();
-            auto text = pop_anchor();
-            tokens.push_back(token_t::make(anchor_pos, token_t::UNICODE_RANGE_TOKEN, std::move(text)));
+          if (isxdigit(c) || c == '?') {
+            pop_anchor();
+            auto token = lex_unicode_range();
+            tokens.push_back(token);
             state = start;
             break;
           }
@@ -1159,7 +1248,24 @@ std::vector<std::shared_ptr<token_t>> lexer_t::lex() {
       }
 
       case minus_start: {
-        if (isdigit(c) || c == '.') {
+        if (c == '-') {
+          pop();
+          c = peek();
+          if (c == '>') {
+            pop();
+            auto text = pop_anchor();
+            tokens.push_back(token_t::make(anchor_pos, token_t::CDC_TOKEN, std::move(text)));
+            state = start;
+            break;
+          }
+          reset_cursor(anchor);
+          pop();
+          c = peek();
+          auto text = pop_anchor();
+          auto token = token_t::make(anchor_pos, token_t::DELIM_TOKEN, std::move(text));
+          tokens.push_back(token);
+          break;
+        } else if (isdigit(c) || c == '.') {
           reset_cursor(anchor);
           pop_anchor();
           auto token = lex_numeric_token();

@@ -13,6 +13,7 @@
 #include "tokens/dimension_token.h"
 #include "tokens/at_keyword_token.h"
 #include "tokens/function_token.h"
+#include "tokens/unicode_range_token.h"
 namespace yourcss {
 
 /* Convert source text into a vector of tokens. */
@@ -59,11 +60,11 @@ public:
   /* Lex a url token. Assumes `url(` has already been consumed */
   std::shared_ptr<token_t> lex_url_token();
 
+  /* Lex a unicode token. Assumes u+ has already been consumed */
+  std::shared_ptr<token_t> lex_unicode_range();
+
   /* Consume string token */
   std::string consume_string(char ending_point);
-
-  /* Consume a unicode token */
-  std::string consume_unicode();
 
   /* Consume a name token */
   std::string consume_name();
