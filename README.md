@@ -10,7 +10,7 @@ A hand rolled lexer implemented as described in [CSS Syntax Module Level 3](http
 - [clang](https://llvm.org) - c++ compiler
 - [ib](https://github.com/JasonL9000/ib) - c++ build tool
 
-```
+```bash
 git submodule init
 git submodule update
 
@@ -26,7 +26,7 @@ ib test/selector-test.cc
 
 ## Example
 
-```
+```c++
 #include <yourcss/lexer.h>
 
 using namespace yourcss;
