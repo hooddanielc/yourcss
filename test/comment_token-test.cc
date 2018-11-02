@@ -47,3 +47,8 @@ FIXTURE(comment_nasty) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("/* *O*R*  *N*A*S*T*Y* */"));
 }
+
+int main(int argc, char *argv[]) {
+  return dj::lick::main(argc, argv);
+}
+

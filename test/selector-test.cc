@@ -32,3 +32,7 @@ FIXTURE(at_regular_name) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[17]->get_kind());
   EXPECT_EQ(token_t::kind_t::RIGHT_BRACE_TOKEN, tokens[18]->get_kind());
 }
+
+int main(int argc, char *argv[]) {
+  return dj::lick::main(argc, argv);
+}
