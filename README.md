@@ -1,6 +1,8 @@
 yourcss lexer
 =============
 
+[![Build Status](https://jenkins.havenofcode.com/buildStatus/icon?job=yourcss/master)](https://jenkins.havenofcode.com/job/yourcss/job/master/)
+
 A hand rolled lexer implemented as described in [CSS Syntax Module Level 3](https://www.w3.org/TR/css-syntax-3/#tokenization) Tokenization.
 
 ## Building
