@@ -33,3 +33,7 @@ FIXTURE(at_dash_name) {
     std::cout << "WRONG: " << e.what() << std::endl;
   }
 }
+
+int main(int argc, char *argv[]) {
+  return dj::lick::main(argc, argv);
+}
