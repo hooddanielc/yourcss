@@ -1,10 +1,10 @@
-#include <lick/lick.h>
+#include <gtest/gtest.h>
 #include <yourcss/lexer.h>
 #include <yourcss/token.h>
 
 using namespace yourcss;
 
-FIXTURE(at_regular_name) {
+TEST(at_keyword_token, at_regular_name) {
   try {
     const char *src = R"(
       @media
@@ -19,7 +19,7 @@ FIXTURE(at_regular_name) {
   }
 }
 
-FIXTURE(at_dash_name) {
+TEST(at_keyword_token, at_dash_name) {
   try {
     const char *src = R"(
       @-moz-media
@@ -32,8 +32,4 @@ FIXTURE(at_dash_name) {
   } catch (const std::exception &e) {
     std::cout << "WRONG: " << e.what() << std::endl;
   }
-}
-
-int main(int argc, char *argv[]) {
-  return dj::lick::main(argc, argv);
 }

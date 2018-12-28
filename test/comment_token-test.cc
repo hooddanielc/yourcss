@@ -1,10 +1,10 @@
-#include <lick/lick.h>
+#include <gtest/gtest.h>
 #include <yourcss/lexer.h>
 #include <yourcss/token.h>
 
 using namespace yourcss;
 
-FIXTURE(comment_normal) {
+TEST(comment_token, comment_normal) {
   const char *src = R"(
     /* This is a nice comment */
   )";
@@ -17,7 +17,7 @@ FIXTURE(comment_normal) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("/* This is a nice comment */"));
 }
 
-FIXTURE(comment_nice) {
+TEST(comment_token, comment_nice) {
   const char *src = R"(
     /**
      * Comments can be nice
@@ -35,7 +35,7 @@ FIXTURE(comment_nice) {
   ));
 }
 
-FIXTURE(comment_nasty) {
+TEST(comment_token, comment_nasty) {
   const char *src = R"(
     /* *O*R*  *N*A*S*T*Y* */
   )";
@@ -47,8 +47,3 @@ FIXTURE(comment_nasty) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("/* *O*R*  *N*A*S*T*Y* */"));
 }
-
-int main(int argc, char *argv[]) {
-  return dj::lick::main(argc, argv);
-}
-
