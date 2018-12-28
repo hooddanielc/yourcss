@@ -1,10 +1,10 @@
-#include <lick/lick.h>
+#include <gtest/gtest.h>
 #include <yourcss/lexer.h>
 #include <yourcss/token.h>
 
 using namespace yourcss;
 
-FIXTURE(at_regular_name) {
+TEST(selector, at_regular_name) {
   const char *src = R"(
     .cool {
       something: 123;
@@ -31,8 +31,4 @@ FIXTURE(at_regular_name) {
   EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[16]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[17]->get_kind());
   EXPECT_EQ(token_t::kind_t::RIGHT_BRACE_TOKEN, tokens[18]->get_kind());
-}
-
-int main(int argc, char *argv[]) {
-  return dj::lick::main(argc, argv);
 }

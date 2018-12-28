@@ -19,3 +19,7 @@ TARGET_LIST=(../out/test/test/*-test)
 llvm-profdata merge -sparse "${FILE_LIST[@]}" -o "${OUT_DIR}/coverage/all.profdata"
 llvm-cov show "${TARGET_LIST[@]}" -instr-profile="${OUT_DIR}/coverage/all.profdata"
 llvm-cov report "${TARGET_LIST[@]}" -instr-profile="${OUT_DIR}/coverage/all.profdata"
+llvm-cov export "${TARGET_LIST[@]}" -instr-profile="${OUT_DIR}/coverage/all.profdata" > "${OUT_DIR}/coverage/report.json"
+echo ''
+echo 'coverage report written to ../out/coverage/report.json'
+echo ''

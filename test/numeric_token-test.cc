@@ -1,10 +1,10 @@
-#include <lick/lick.h>
+#include <gtest/gtest.h>
 #include <yourcss/lexer.h>
 #include <yourcss/token.h>
 
 using namespace yourcss;
 
-FIXTURE(regular_number) {
+TEST(numeric_token, regular_number) {
   const char *src = R"(
     123
   )";
@@ -17,7 +17,7 @@ FIXTURE(regular_number) {
   EXPECT_TRUE(number->get_value() == double(123.0));
 }
 
-FIXTURE(negative_number) {
+TEST(numeric_token, negative_number) {
   const char *src = R"(
     -123
   )";
@@ -30,7 +30,7 @@ FIXTURE(negative_number) {
   EXPECT_TRUE(number->get_value() == double(-123.0));
 }
 
-FIXTURE(positive_number) {
+TEST(numeric_token, positive_number) {
   const char *src = R"(
     +123
   )";
@@ -43,7 +43,7 @@ FIXTURE(positive_number) {
   EXPECT_TRUE(number->get_value() == double(123.0));
 }
 
-FIXTURE(decimal) {
+TEST(numeric_token, decimal) {
   const char *src = R"(
     123.3
   )";
@@ -56,7 +56,7 @@ FIXTURE(decimal) {
   EXPECT_TRUE(number->get_value() == double(123.3));
 }
 
-FIXTURE(neg_decimal) {
+TEST(numeric_token, neg_decimal) {
   const char *src = R"(
     -123.3
   )";
@@ -69,7 +69,7 @@ FIXTURE(neg_decimal) {
   EXPECT_TRUE(number->get_value() == double(-123.3));
 }
 
-FIXTURE(neg_start_decimal) {
+TEST(numeric_token, neg_start_decimal) {
   const char *src = R"(
     -.3
   )";
@@ -82,7 +82,7 @@ FIXTURE(neg_start_decimal) {
   EXPECT_TRUE(number->get_value() == double(-0.3));
 }
 
-FIXTURE(exponent) {
+TEST(numeric_token, exponent) {
   const char *src = R"(
     3e3
   )";
@@ -95,7 +95,7 @@ FIXTURE(exponent) {
   EXPECT_TRUE(number->get_value() == double(3000.0));
 }
 
-FIXTURE(neg_exponent) {
+TEST(numeric_token, neg_exponent) {
   const char *src = R"(
     -3e3
   )";
@@ -108,7 +108,7 @@ FIXTURE(neg_exponent) {
   EXPECT_TRUE(number->get_value() == double(-3000.0f));
 }
 
-FIXTURE(pos_exponent) {
+TEST(numeric_token, pos_exponent) {
   const char *src = R"(
     +3e3
   )";
@@ -121,7 +121,7 @@ FIXTURE(pos_exponent) {
   EXPECT_TRUE(number->get_value() == double(3000.0f));
 }
 
-FIXTURE(pos_exponent_pos) {
+TEST(numeric_token, pos_exponent_pos) {
   const char *src = R"(
     +3e+3
   )";
@@ -132,7 +132,7 @@ FIXTURE(pos_exponent_pos) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("+3e+3"));
 }
 
-FIXTURE(neg_exponent_pos) {
+TEST(numeric_token, neg_exponent_pos) {
   const char *src = R"(
     -3e+3
   )";
@@ -143,7 +143,7 @@ FIXTURE(neg_exponent_pos) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("-3e+3"));
 }
 
-FIXTURE(neg_exponent_neg) {
+TEST(numeric_token, neg_exponent_neg) {
   const char *src = R"(
     -3e-3
   )";
@@ -154,7 +154,7 @@ FIXTURE(neg_exponent_neg) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("-3e-3"));
 }
 
-FIXTURE(dec_exponent) {
+TEST(numeric_token, dec_exponent) {
   const char *src = R"(
     3.3e3
   )";
@@ -165,7 +165,7 @@ FIXTURE(dec_exponent) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("3.3e3"));
 }
 
-FIXTURE(pos_dec_exponent) {
+TEST(numeric_token, pos_dec_exponent) {
   const char *src = R"(
     +3.3e3
   )";
@@ -176,7 +176,7 @@ FIXTURE(pos_dec_exponent) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("+3.3e3"));
 }
 
-FIXTURE(neg_dec_exponent) {
+TEST(numeric_token, neg_dec_exponent) {
   const char *src = R"(
     -3.3e3
   )";
@@ -187,7 +187,7 @@ FIXTURE(neg_dec_exponent) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("-3.3e3"));
 }
 
-FIXTURE(dimension_token) {
+TEST(numeric_token, dimension_token) {
   const char *src = R"(
     123px
   )";
@@ -198,7 +198,7 @@ FIXTURE(dimension_token) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("123px"));
 }
 
-FIXTURE(identifier_token_negative) {
+TEST(numeric_token, identifier_token_negative) {
   const char *src = R"(
     -123px
   )";
@@ -209,7 +209,7 @@ FIXTURE(identifier_token_negative) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("-123px"));
 }
 
-FIXTURE(identifier_token_positive) {
+TEST(numeric_token, identifier_token_positive) {
   const char *src = R"(
     +123px
   )";
@@ -220,7 +220,7 @@ FIXTURE(identifier_token_positive) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("+123px"));
 }
 
-FIXTURE(dimension_decimal) {
+TEST(numeric_token, dimension_decimal) {
   const char *src = R"(
     123.3px
   )";
@@ -231,7 +231,7 @@ FIXTURE(dimension_decimal) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("123.3px"));
 }
 
-FIXTURE(neg_dimension_decimal) {
+TEST(numeric_token, neg_dimension_decimal) {
   const char *src = R"(
     -123.3px
   )";
@@ -242,7 +242,7 @@ FIXTURE(neg_dimension_decimal) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("-123.3px"));
 }
 
-FIXTURE(pos_dimension_decimal) {
+TEST(numeric_token, pos_dimension_decimal) {
   const char *src = R"(
     +123.3px
   )";
@@ -253,7 +253,7 @@ FIXTURE(pos_dimension_decimal) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("+123.3px"));
 }
 
-FIXTURE(dimension_token_dash_name) {
+TEST(numeric_token, dimension_token_dash_name) {
   const char *src = R"(
     123-cool-px
   )";
@@ -264,7 +264,7 @@ FIXTURE(dimension_token_dash_name) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("123-cool-px"));
 }
 
-FIXTURE(dimension_weird_escaped_name) {
+TEST(numeric_token, dimension_weird_escaped_name) {
   const char *src = R"(
     123-moz\*cool
   )";
@@ -273,8 +273,4 @@ FIXTURE(dimension_weird_escaped_name) {
   EXPECT_EQ(token_t::kind_t::DIMENSION_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("123-moz\\*cool"));
-}
-
-int main(int argc, char *argv[]) {
-  return dj::lick::main(argc, argv);
 }

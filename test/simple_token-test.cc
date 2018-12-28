@@ -1,10 +1,10 @@
-#include <lick/lick.h>
+#include <gtest/gtest.h>
 #include <yourcss/lexer.h>
 #include <yourcss/token.h>
 
 using namespace yourcss;
 
-FIXTURE(hash_delimeter_token) {
+TEST(simple_token, hash_delimeter_token) {
   const char *src = R"(
     #
   )";
@@ -14,7 +14,7 @@ FIXTURE(hash_delimeter_token) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
 }
 
-FIXTURE(hash_token) {
+TEST(simple_token, hash_token) {
   const char *src = R"(
     #\asdf
   )";
@@ -25,7 +25,7 @@ FIXTURE(hash_token) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("\\asdf"));
 }
 
-FIXTURE(hash_token_dash) {
+TEST(simple_token, hash_token_dash) {
   const char *src = R"(
     #-moz-asdf
   )";
@@ -36,7 +36,7 @@ FIXTURE(hash_token_dash) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("-moz-asdf"));
 }
 
-FIXTURE(hash_name) {
+TEST(simple_token, hash_name) {
   const char *src = R"(
     #asdf
   )";
@@ -47,7 +47,7 @@ FIXTURE(hash_name) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("asdf"));
 }
 
-FIXTURE(simple_string) {
+TEST(simple_token, simple_string) {
   const char *src = R"(
     "this is a string?"
   )";
@@ -58,7 +58,7 @@ FIXTURE(simple_string) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("this is a string?"));
 }
 
-FIXTURE(single_simple_string) {
+TEST(simple_token, single_simple_string) {
   const char *src = R"(
     'this is a string?'
   )";
@@ -69,7 +69,7 @@ FIXTURE(single_simple_string) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("this is a string?"));
 }
 
-FIXTURE(suffix_match_token) {
+TEST(simple_token, suffix_match_token) {
   const char *src = R"(
     $=
   )";
@@ -81,7 +81,7 @@ FIXTURE(suffix_match_token) {
 }
 
 
-FIXTURE(single_left_paren) {
+TEST(simple_token, single_left_paren) {
   const char *src = R"(
     (
   )";
@@ -91,7 +91,7 @@ FIXTURE(single_left_paren) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
 }
 
-FIXTURE(single_right_paren) {
+TEST(simple_token, single_right_paren) {
   const char *src = R"(
     )
   )";
@@ -101,7 +101,7 @@ FIXTURE(single_right_paren) {
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
 }
 
-FIXTURE(substring_match_token) {
+TEST(simple_token, substring_match_token) {
   const char *src = R"(
     *=
   )";
@@ -110,8 +110,4 @@ FIXTURE(substring_match_token) {
   EXPECT_EQ(token_t::kind_t::SUBSTRING_MATCH_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::WHITESPACE_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("*="));
-}
-
-int main(int argc, char *argv[]) {
-  return dj::lick::main(argc, argv);
 }

@@ -1,10 +1,10 @@
-#include <lick/lick.h>
+#include <gtest/gtest.h>
 #include <yourcss/lexer.h>
 #include <yourcss/token.h>
 
 using namespace yourcss;
 
-FIXTURE(identifier) {
+TEST(ident_token, identifier) {
   const char *src = R"(
     happyfaces
   )";
@@ -15,7 +15,7 @@ FIXTURE(identifier) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("happyfaces"));
 }
 
-FIXTURE(function_identifier) {
+TEST(ident_token, function_identifier) {
   const char *src = R"(
     happyfaces(123, 123, 123);
   )";
@@ -27,7 +27,7 @@ FIXTURE(function_identifier) {
   EXPECT_EQ(tokens[2]->get_text(), std::string("123"));
 }
 
-FIXTURE(url_identifier) {
+TEST(ident_token, url_identifier) {
   const char *src = R"(
     url(http://danielhood.com);
   )";
@@ -38,7 +38,7 @@ FIXTURE(url_identifier) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
-FIXTURE(url_identifier_white_beg) {
+TEST(ident_token, url_identifier_white_beg) {
   const char *src = R"(
     url( http://danielhood.com);
   )";
@@ -49,7 +49,7 @@ FIXTURE(url_identifier_white_beg) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
-FIXTURE(url_identifier_white_end) {
+TEST(ident_token, url_identifier_white_end) {
   const char *src = R"(
     url(http://danielhood.com );
   )";
@@ -60,7 +60,7 @@ FIXTURE(url_identifier_white_end) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
-FIXTURE(url_identifier_single_quote) {
+TEST(ident_token, url_identifier_single_quote) {
   const char *src = R"(
     url('http://danielhood.com');
   )";
@@ -71,7 +71,7 @@ FIXTURE(url_identifier_single_quote) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
-FIXTURE(url_identifier_single_quote_ws_begin) {
+TEST(ident_token, url_identifier_single_quote_ws_begin) {
   const char *src = R"(
     url( 'http://danielhood.com');
   )";
@@ -82,7 +82,7 @@ FIXTURE(url_identifier_single_quote_ws_begin) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
-FIXTURE(url_identifier_single_quote_ws_end) {
+TEST(ident_token, url_identifier_single_quote_ws_end) {
   const char *src = R"(
     url('http://danielhood.com' );
   )";
@@ -93,7 +93,7 @@ FIXTURE(url_identifier_single_quote_ws_end) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
-FIXTURE(url_identifier_single_quote_ws) {
+TEST(ident_token, url_identifier_single_quote_ws) {
   const char *src = R"(
     url(   'http://danielhood.com' );
   )";
@@ -104,7 +104,7 @@ FIXTURE(url_identifier_single_quote_ws) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
-FIXTURE(url_identifier_double_quote_ws) {
+TEST(ident_token, url_identifier_double_quote_ws) {
   const char *src = R"(
     url( "http://danielhood.com" );
   )";
@@ -115,7 +115,7 @@ FIXTURE(url_identifier_double_quote_ws) {
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
 }
 
-FIXTURE(url_identifier_double_quote_ws_nice) {
+TEST(ident_token, url_identifier_double_quote_ws_nice) {
   const char *src = R"(
     url("http://danielhood.com");
   )";
@@ -124,8 +124,4 @@ FIXTURE(url_identifier_double_quote_ws_nice) {
   EXPECT_EQ(token_t::kind_t::URL_TOKEN, tokens[1]->get_kind());
   EXPECT_EQ(token_t::kind_t::SEMICOLON_TOKEN, tokens[2]->get_kind());
   EXPECT_EQ(tokens[1]->get_text(), std::string("http://danielhood.com"));
-}
-
-int main(int argc, char *argv[]) {
-  return dj::lick::main(argc, argv);
 }
