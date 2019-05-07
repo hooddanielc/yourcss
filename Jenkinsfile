@@ -1,17 +1,19 @@
 pipeline {
-    agent any
+  agent any
 
-    stages {
-        stage('Build') {
-            steps {
-                checkout scm
-                sh '/bin/bash scripts/build_in_container.sh'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh '/bin/bash scripts/test_in_container.sh'
-            }
-        }
+  stages {
+    stage('Build') {
+      agent { label 'ib' }
+      steps {
+        sh './scripts/build.sh'
+      }
     }
+
+    stage('Test') {
+      agent { label 'ib' }
+      steps {
+        sh './scripts/test.sh'
+      }
+    }
+  }
 }
